@@ -43,7 +43,21 @@
  *  - Make your function accept a parameter for the direction of rotation (1 = clockwise, -1 = counterclockwise)
  */
 
-var rotateMatrix = function(matrix
-) {
-  // Your code here.
+
+const array1 = [[1,2,3,4], [5,6,7,8], [9,68,75,83]]
+const array2 = [ [1,2], [5,6], [9,68]]
+
+const rotateMatrix = array => {
+  const result = [];
+  let x = 0;
+
+  while (x <= array.length) {
+    for (let i = 0; i < array.length; i++) {
+      result.push(array[array.length-1-i][x])
+    }
+    x++
+  }
+  return result
 };
+
+rotateMatrix(array1) //[9, 5, 1, 68, 6, 2, 75, 7, 3, 83, 8, 4]
