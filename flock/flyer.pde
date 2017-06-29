@@ -2,13 +2,11 @@ class flyer {
   PVector dir;
   PVector pos;
   float vel;
-  float turn;
   
   flyer() {
     pos = new PVector(width/2, height/2);
     dir = new PVector(1, 0);
-    vel = 3;
-    turn = 0;
+    vel = 0.8;
   }
   
   void draw() {
@@ -18,7 +16,7 @@ class flyer {
   }
   
   void move() {
-    pos.add(dir);
+    pos.add(PVector.mult(dir, vel));
     pos.x = (pos.x + width) % width;
     pos.y = (pos.y + height) % height;
   }
