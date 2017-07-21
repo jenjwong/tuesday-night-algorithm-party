@@ -10,14 +10,17 @@ class flyer {
   }
   
   void draw() {
-    triangle(pos.x + (dir.x * 15), pos.y + (dir.y * 15),
-             pos.x + (dir.y * -5), pos.y + (dir.x * 5),
-             pos.x + (dir.y * 5), pos.y + (dir.x * -5));
+    PVector nDir = this.dir.copy();
+    nDir.normalize();
+    triangle(pos.x + (nDir.x * 15), pos.y + (nDir.y * 15),
+             pos.x + (nDir.y * -5), pos.y + (nDir.x * 5),
+             pos.x + (nDir.y * 5), pos.y + (nDir.x * -5));
   }
   
   void move() {
     pos.add(PVector.mult(dir, vel));
     pos.x = (pos.x + width) % width;
     pos.y = (pos.y + height) % height;
+    dir.normalize();
   }
 }

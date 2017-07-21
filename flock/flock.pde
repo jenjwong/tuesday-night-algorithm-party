@@ -4,6 +4,7 @@ flyer fly;
 flyer[] flock;
 int nFlock;
 float perceptionRadius = 80;
+float idealSeparation = 30;
 
 
 void setup() {
@@ -12,7 +13,7 @@ void setup() {
   
   showDebug = false;
   
-  nFlock = 400;
+  nFlock = 200;
   fly = new flyer();
   flock = new flyer[nFlock];
 
@@ -56,7 +57,8 @@ void draw() {
   }
 
   for (flyer f : flock) {
-    reorientFlyer(f);
+    reorientFlyer(f);           // make them flock
+    repelAndAttractFlyer(f);    // force directed formation, prevent bunching
   }
 }
 
@@ -126,11 +128,30 @@ void reorientFlyer(flyer f) {
   } // else abs(diff) <= PI, we're good.
   
   // Rotate f so it heads towards newDir.
-  f.dir.rotate(diff / 100); // Smoothing constant
+  f.dir.rotate(diff / 10); // Smoothing constant
 
   if (showDebug) {
     strokeWeight(1);
     stroke(0, 255, 0);
     line(f.pos.x, f.pos.y, f.pos.x + newDir.x * 30, f.pos.y + newDir.y * 30);
   }
+}
+
+
+void repelAndAttractFlyer(flyer f) {
+  ArrayList<flyer> neighbors = near(f);
+  PVector offsetDir;
+  PVector forceAdjustment = new PVector();
+  float offsetDist;
+  
+  for (flyer n : neighbors) {
+    offsetDir = PVector.sub(f.pos, n.pos);
+    offsetDist = offsetDir.mag();
+    offsetDir = offsetDir.normalize().mult(idealSeparation - offsetDist);
+    forceAdjustment.add(offsetDir);
+  }
+
+  forceAdjustment.mult(1 / 100.0); // Smoothing constant
+  println(forceAdjustment);
+  f.dir.add(forceAdjustment);
 }
