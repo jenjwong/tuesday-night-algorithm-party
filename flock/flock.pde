@@ -1,3 +1,7 @@
+import java.util.Collections;
+import java.util.Comparator;
+
+
 boolean showDebug;
 
 flyer fly;
@@ -13,7 +17,7 @@ void setup() {
   
   showDebug = false;
   
-  nFlock = 200;
+  nFlock = 1000;
   fly = new flyer();
   flock = new flyer[nFlock];
 
@@ -81,10 +85,15 @@ void keyPressed() {
 
 
 ArrayList<flyer> near(flyer o) {
+  return near(o, perceptionRadius);
+}
+
+
+ArrayList<flyer> near(flyer o, float radius) {
   ArrayList<flyer> res = new ArrayList<flyer>();
   
   for (flyer f : flock) {
-    if (o != f && o.pos.dist(f.pos) <= perceptionRadius) {
+    if (o != f && o.pos.dist(f.pos) <= radius) {
       res.add(f);
     }
   }
@@ -138,20 +147,40 @@ void reorientFlyer(flyer f) {
 }
 
 
-void repelAndAttractFlyer(flyer f) {
+void repelAndAttractFlyer(final flyer f) {
   ArrayList<flyer> neighbors = near(f);
   PVector offsetDir;
   PVector forceAdjustment = new PVector();
   float offsetDist;
+
+  Comparator comp = new Comparator<flyer>() {
+    public int compare(flyer f1, flyer f2) {
+      float diff = PVector.dist(f2.pos, f.pos) - PVector.dist(f1.pos, f.pos);
+      if (diff > 0) {
+        return -1;
+      } else if (diff < 0) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+  };
   
+  // Favor closest neighbors.
+  Collections.sort(neighbors, comp);
+
+  int count = 0;
   for (flyer n : neighbors) {
+    if (++count > 4) {  // Limit the number of neighbors that affect f's formation.
+      break;
+    }
+
     offsetDir = PVector.sub(f.pos, n.pos);
     offsetDist = offsetDir.mag();
     offsetDir = offsetDir.normalize().mult(idealSeparation - offsetDist);
     forceAdjustment.add(offsetDir);
   }
 
-  forceAdjustment.mult(1 / 100.0); // Smoothing constant
-  println(forceAdjustment);
+  forceAdjustment.mult(1 / 1000.0); // Smoothing constant
   f.dir.add(forceAdjustment);
 }
